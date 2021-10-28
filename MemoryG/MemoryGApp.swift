@@ -13,7 +13,7 @@ struct MemoryGApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel: game)
+            EmojiMemmoryGameView(game: game)
         }
     }
 }

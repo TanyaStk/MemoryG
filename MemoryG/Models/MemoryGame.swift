@@ -12,7 +12,10 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
     private(set) var cards: Array<Card>
     private(set) var score: Int
     
-    private var indexOfTheOneAndOnlyFaceUpCard: Int?
+    private var indexOfTheOneAndOnlyFaceUpCard: Int?{
+        get { cards.indices.filter({ cards[$0].isFaceUp}).oneAndOnly }
+        set { cards.indices.forEach { cards[$0].isFaceUp = ($0 == newValue) } }
+    }
     
     var themeColor: Color
     
@@ -29,20 +32,15 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
                 } else {
                     changeScore(to: score - MISMATCH_POINT_CHANGE)
                 }
-                indexOfTheOneAndOnlyFaceUpCard = nil
+                cards[choosenIndex].isFaceUp = true
             } else {
-                for index in cards.indices {
-                    cards[index].isFaceUp = false
-                }
                 indexOfTheOneAndOnlyFaceUpCard = choosenIndex
             }
-            cards[choosenIndex].isFaceUp.toggle()
         }
-//        print("Chosen \(card)")
     }
  
     init(numberOfPairsOfCards: Int, createCardContent: (Int) -> CardContent, themeColor: Color){
-        cards = Array<Card>()
+        cards = []
         score = 0
         //add numberOfPairsOfCards x 2 cards to cards array
         for pairIndex in 0..<numberOfPairsOfCards{
@@ -63,14 +61,24 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
     }
     
     struct Card: Identifiable {
-        var isFaceUp: Bool = false
-        var isMatched: Bool = false
-        var content: CardContent
-        var id: Int
+        var isFaceUp = false
+        var isMatched = false
+        let content: CardContent
+        let id: Int
     }
     
     //MARK: Constants
     
     let MATCH_POINT_CHANGE = 10
     let MISMATCH_POINT_CHANGE = 5
+}
+
+extension Array {
+    var oneAndOnly: Element? {
+        if count == 1 {
+            return first
+        } else {
+            return nil
+        }
+    }
 }
